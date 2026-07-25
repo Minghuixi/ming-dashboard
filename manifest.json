@@ -1,0 +1,22 @@
+{
+  "name": "✨明の工作台",
+  "short_name": "明の工作台",
+  "description": "每日任务 · 心愿清单 · 备忘录 · 感想笔记 · 养生知识 · 变美妙招",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f7f4",
+  "theme_color": "#f0f7f4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='44' fill='%23e8f5e9'/%3E%3Ctext x='96' y='125' font-size='100' text-anchor='middle'%3E✨%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='120' fill='%23e8f5e9'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle'%3E✨%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

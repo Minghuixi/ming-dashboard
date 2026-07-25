@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#f0f7f4">
+  <title>明の工作台</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23e8f5e9'/%3E%3Cpath d='M90 28 L96 54 L122 48 L102 66 L124 84 L96 80 L90 108 L84 80 L56 84 L78 66 L58 48 L84 54 Z' fill='%2381c784'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --mint: #e8f5e9;
+      --mint-dark: #c8e6c9;
+      --pink: #fce4ec;
+      --pink-dark: #f8bbd0;
+      --green: #81c784;
+      --green-dark: #66bb6a;
+      --rose: #f48fb1;
+      --rose-dark: #ec407a;
+      --text: #37474f;
+      --text-light: #78909c;
+      --bg: #f0f7f4;
+      --card: rgba(255, 255, 255, 0.88);
+      --shadow: 0 4px 20px rgba(129, 199, 132, 0.12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #f0f7f4 0%, #fff5f7 100%);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header */
+    header {
+      padding: 16px 20px 10px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      background: rgba(240, 247, 244, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      border-bottom: 1px solid rgba(200, 230, 201, 0.4);
+    }
+
+    .greeting {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+    }
+
+    h1 svg {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .title-text {
+      background: linear-gradient(90deg, #66bb6a, #f48fb1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .date-line {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: sticky;
+      top: 68px;
+      background: rgba(240, 247, 244, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 99;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-tab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--card);
+      border: 1px solid rgba(200, 230, 201, 0.5);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(129, 199, 132, 0.08);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .nav-tab svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--mint-dark), var(--pink-dark));
+      color: var(--text);
+      border-color: transparent;
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(129, 199, 132, 0.2);
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      padding: 0 16px 100px;
+      overflow-y: auto;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Tasks */
+    .progress-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, var(--mint), #fff);
+      border-radius: 14px;
+      border: 1px solid rgba(200, 230, 201, 0.4);
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .progress-text strong {
+      color: var(--green-dark);
+      font-size: 18px;
+    }
+
+    .progress-bar {
+      width: 100px;
+      height: 8px;
+      background: rgba(200, 230, 201, 0.4);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--green-dark));
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    .task-list {
+      list-style: none;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(236, 239, 241, 0.8);
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .checkbox svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s;
+    }
+
+    .checkbox.checked {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .checkbox.checked svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .task-item.done .task-text {
+      text-decoration: line-through;
+      color: var(--text-light);
+    }
+
+    .task-delete {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(244, 143, 177, 0.15);
+      color: #f06292;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .task-item:active .task-delete,
+    .task-item:hover .task-delete {
+      opacity: 1;
+    }
+
+    .add-box {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(200, 230, 201, 0.6);
+    }
+
+    .add-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid rgba(200, 230, 201, 0.6);
+      border-radius: 14px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.6);
+      outline: none;
+      font-family: inherit;
+    }
+
+    .add-input:focus {
+      border-color: var(--green);
+      background: white;
+    }
+
+    .add-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: white;
+      font-size: 20px;
+      font-weight: 300;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Wish list */
+    .wish-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(236, 239, 241, 0.8);
+    }
+
+    .wish-item:last-child {
+      border-bottom: none;
+    }
+
+    .wish-star {
+      color: #ffb74d;
+      flex-shrink: 0;
+    }
+
+    .wish-star svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .wish-text {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .wish-delete {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(244, 143, 177, 0.15);
+      color: #f06292;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Notes */
+    .note-textarea {
+      width: 100%;
+      min-height: 180px;
+      border: 1px solid rgba(200, 230, 201, 0.4);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.7;
+      background: rgba(255, 255, 255, 0.6);
+      resize: vertical;
+      font-family: inherit;
+      outline: none;
+      color: var(--text);
+    }
+
+    .note-textarea:focus {
+      border-color: var(--green);
+      background: white;
+    }
+
+    .save-hint {
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: right;
+      margin-top: 8px;
+    }
+
+    /* Beauty sub-sections */
+    .sub-card {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(248, 187, 208, 0.3);
+    }
+
+    .sub-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #ec407a;
+    }
+
+    .sub-title svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Empty state */
+    .empty-hint {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+
+    /* Install hint */
+    .install-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(200, 230, 201, 0.5);
+      padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .install-bar.show {
+      display: flex;
+    }
+
+    .install-text {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .install-btn {
+      padding: 8px 16px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .install-close {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 300;
+      font-size: 18px;
+      animation: floatUp 1.2s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-120px) scale(0.6); opacity: 0; }
+    }
+
+    /* SVG colors */
+    .icon-green { stroke: var(--green-dark); fill: none; }
+    .icon-green-fill { fill: var(--green-dark); stroke: none; }
+    .icon-rose { stroke: var(--rose-dark); fill: none; }
+    .icon-rose-fill { fill: var(--rose-dark); stroke: none; }
+    .icon-orange-fill { fill: #ffb74d; stroke: none; }
+    .icon-blue { stroke: #64b5f6; fill: none; }
+    .icon-purple { stroke: #ba68c8; fill: none; }
+    .icon-teal { stroke: #4db6ac; fill: none; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="greeting" id="greeting">你好呀</div>
+      <h1>
+        <svg viewBox="0 0 24 24" class="icon-green-fill">
+          <path d="M12 2L13.5 8.5L20 7L15.5 11.5L22 15L15 15L17 22L12 17.5L7 22L9 15L2 15L8.5 11.5L4 7L10.5 8.5L12 2Z"/>
+        </svg>
+        <span class="title-text">明の工作台</span>
+      </h1>
+      <div class="date-line" id="dateLine">今天也要闪闪发光</div>
+    </header>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-section="tasks">
+        <svg viewBox="0 0 24 24" class="icon-green"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        每日任务
+      </button>
+      <button class="nav-tab" data-section="wish">
+        <svg viewBox="0 0 24 24" class="icon-orange-fill"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2-6-4.8-6 4.8L8.9 14 3 9.2h7.6L12 2z"/></svg>
+        Wish List
+      </button>
+      <button class="nav-tab" data-section="memo">
+        <svg viewBox="0 0 24 24" class="icon-blue"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        备忘录
+      </button>
+      <button class="nav-tab" data-section="notes">
+        <svg viewBox="0 0 24 24" class="icon-purple"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        感想笔记
+      </button>
+      <button class="nav-tab" data-section="health">
+        <svg viewBox="0 0 24 24" class="icon-teal"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+        养生知识
+      </button>
+      <button class="nav-tab" data-section="beauty">
+        <svg viewBox="0 0 24 24" class="icon-rose"><path d="M12 2C7 2 3 6 3 11c0 5.25 7 11 9 11s9-5.75 9-11c0-5-4-9-9-9z"/><path d="M12 14a3 3 0 100-6 3 3 0 000 6z"/></svg>
+        变美妙招
+      </button>
+    </nav>
+
+    <main>
+      <!-- 每日任务 -->
+      <section id="tasks" class="section active">
+        <div class="card">
+          <div class="card-title">
+            <span class="card-icon" style="background: #e8f5e9;">
+              <svg viewBox="0 0 24 24" class="icon-green"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </span>
+            今日任务
+          </div>
+          <div class="progress-box">
+            <div class="progress-text">已完成 <strong id="doneCount">0</strong>/<span id="totalCount">0</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+          </div>
+          <ul class="task-list" id="taskList"></ul>
+          <div class="add-box">
+            <input type="text" class="add-input" id="taskInput" placeholder="添加新任务..." maxlength="50">
+            <button class="add-btn" id="addTaskBtn">+</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Wish List -->
+      <section id="wish" class="section">
+        <div class="card">
+          <div class="card-title">
+            <span class="card-icon" style="background: #fff3e0;">
+              <svg viewBox="0 0 24 24" class="icon-orange-fill"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2-6-4.8-6 4.8L8.9 14 3 9.2h7.6L12 2z"/></svg>
+            </span>
+            心愿清单
+          </div>
+          <ul class="task-list" id="wishList"></ul>
+          <div class="add-box">
+            <input type="text" class="add-input" id="wishInput" placeholder="写下一个小愿望..." maxlength="60">
+            <button class="add-btn" id="addWishBtn">+</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 备忘录 -->
+      <section id="memo" class="section">
+        <div class="card">
+          <div class="card-title">
+            <span class="card-icon" style="background: #e3f2fd;">
+              <svg viewBox="0 0 24 24" class="icon-blue"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </span>
+            备忘录
+          </div>
+          <textarea class="note-textarea" id="memoText" placeholder="随手记点什么...
+
+比如：
+- 明天要买的东西
+- 待办事项
+- 突然想到的点子"></textarea>
+          <div class="save-hint" id="memoHint">已自动保存</div>
+        </div>
+      </section>
+
+      <!-- 感想笔记 -->
+      <section id="notes" class="section">
+        <div class="card">
+          <div class="card-title">
+            <span class="card-icon" style="background: #f3e5f5;">
+              <svg viewBox="0 0 24 24" class="icon-purple"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </span>
+            感想笔记
+          </div>
+          <textarea class="note-textarea" id="notesText" placeholder="记录今天的心情和想法...
+
+小确幸、反思、灵感都可以写在这里~"></textarea>
+          <div class="save-hint" id="notesHint">已自动保存</div>
+        </div>
+      </section>
+
+      <!-- 养生知识 -->
+      <section id="health" class="section">
+        <div class="card">
+          <div class="card-title">
+            <span class="card-icon" style="background: #e0f2f1;">
+              <svg viewBox="0 0 24 24" class="icon-teal"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+            </span>
+            养生知识
+          </div>
+          <textarea class="note-textarea" id="healthText" placeholder="收藏有用的养生小知识...
+
+比如：
+- 泡脚水温 40°C 左右最好
+- 睡前 1 小时不看屏幕
+- 晨起一杯温水"></textarea>
+          <div class="save-hint" id="healthHint">已自动保存</div>
+        </div>
+      </section>
+
+      <!-- 变美妙招 -->
+      <section id="beauty" class="section">
+        <div class="card">
+          <div class="card-title">
+            <span class="card-icon" style="background: #fce4ec;">
+              <svg viewBox="0 0 24 24" class="icon-rose"><path d="M12 2C7 2 3 6 3 11c0 5.25 7 11 9 11s9-5.75 9-11c0-5-4-9-9-9z"/><path d="M12 14a3 3 0 100-6 3 3 0 000 6z"/></svg>
+            </span>
+            变美妙招
+          </div>
+          <div class="sub-card">
+            <div class="sub-title">
+              <svg viewBox="0 0 24 24" class="icon-rose"><path d="M12 2C7 2 3 6 3 11c0 5.25 7 11 9 11s9-5.75 9-11c0-5-4-9-9-9z"/><path d="M12 14a3 3 0 100-6 3 3 0 000 6z"/></svg>
+              化妆笔记
+            </div>
+            <textarea class="note-textarea" id="makeupText" placeholder="记录化妆技巧、爱用物、妆容灵感..." style="min-height: 140px;"></textarea>
+            <div class="save-hint" id="makeupHint">已自动保存</div>
+          </div>
+          <div class="sub-card">
+            <div class="sub-title">
+              <svg viewBox="0 0 24 24" class="icon-rose"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a2 2 0 001.6 1.6l4.15.83M12 14l2.5 8.5M12 14l-2.5 8.5M12 14V8"/></svg>
+              穿搭灵感
+            </div>
+            <textarea class="note-textarea" id="outfitText" placeholder="记录穿搭公式、种草单品、搭配灵感..." style="min-height: 140px;"></textarea>
+            <div class="save-hint" id="outfitHint">已自动保存</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="install-bar" id="installBar">
+      <span class="install-text">添加到主屏幕，使用更方便</span>
+      <button class="install-btn" id="installBtn">添加</button>
+      <button class="install-close" id="installClose">×</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== 数据初始化 =====
+    const defaultTasks = [
+      { id: 't1', text: '吃补剂', done: false },
+      { id: 't2', text: '梳头', done: false },
+      { id: 't3', text: '运动1小时', done: false },
+      { id: 't4', text: '读书5页', done: false },
+      { id: 't5', text: '十点前躺床上', done: false },
+      { id: 't6', text: 'mewing', done: false }
+    ];
+
+    function load(key, fallback) {
+      try {
+        const raw = localStorage.getItem('ming_' + key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function save(key, value) {
+      localStorage.setItem('ming_' + key, JSON.stringify(value));
+    }
+
+    let tasks = load('tasks', defaultTasks);
+    let wishes = load('wishes', []);
+    const notes = {
+      memo: load('memo', ''),
+      notes: load('notes', ''),
+      health: load('health', ''),
+      makeup: load('makeup', ''),
+      outfit: load('outfit', '')
+    };
+
+    // 每日自动重置任务完成状态（按日期）
+    const lastReset = localStorage.getItem('ming_lastReset');
+    const today = new Date().toDateString();
+    if (lastReset !== today) {
+      tasks = tasks.map(t => ({ ...t, done: false }));
+      save('tasks', tasks);
+      localStorage.setItem('ming_lastReset', today);
+    }
+
+    // ===== 顶部问候 =====
+    const hour = new Date().getHours();
+    let greet = '早上好';
+    if (hour >= 11) greet = '上午好';
+    if (hour >= 14) greet = '下午好';
+    if (hour >= 18) greet = '晚上好';
+    document.getElementById('greeting').textContent = greet + '，明';
+
+    const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const d = new Date();
+    document.getElementById('dateLine').textContent = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} ${weekDays[d.getDay()]}`;
+
+    // ===== Tab 切换 =====
+    const tabs = document.querySelectorAll('.nav-tab');
+    const sections = document.querySelectorAll('.section');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.section;
+        tabs.forEach(t => t.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+
+    // ===== 每日任务 =====
+    const taskList = document.getElementById('taskList');
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+      const done = tasks.filter(t => t.done).length;
+      document.getElementById('doneCount').textContent = done;
+      document.getElementById('totalCount').textContent = tasks.length;
+      document.getElementById('progressFill').style.width = tasks.length ? (done / tasks.length * 100) + '%' : '0%';
+
+      if (tasks.length === 0) {
+        taskList.innerHTML = '<li class="empty-hint">还没有任务，添加一个吧~</li>';
+        return;
+      }
+
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task-item' + (task.done ? ' done' : '');
+        li.innerHTML = `
+          <div class="checkbox ${task.done ? 'checked' : ''}" data-id="${task.id}">
+            <svg viewBox="0 0 24 24" stroke="white" stroke-width="3" fill="none"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <span class="task-text">${escapeHtml(task.text)}</span>
+          <button class="task-delete" data-id="${task.id}">×</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    taskList.addEventListener('click', (e) => {
+      const cb = e.target.closest('.checkbox');
+      const del = e.target.closest('.task-delete');
+      if (cb) {
+        const task = tasks.find(t => t.id === cb.dataset.id);
+        task.done = !task.done;
+        save('tasks', tasks);
+        renderTasks();
+        if (task.done) showConfetti(cb);
+      } else if (del) {
+        tasks = tasks.filter(t => t.id !== del.dataset.id);
+        save('tasks', tasks);
+        renderTasks();
+      }
+    });
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      tasks.push({ id: 't' + Date.now(), text, done: false });
+      save('tasks', tasks);
+      taskInput.value = '';
+      renderTasks();
+    }
+
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTask(); });
+
+    // ===== Wish List =====
+    const wishList = document.getElementById('wishList');
+    const wishInput = document.getElementById('wishInput');
+    const addWishBtn = document.getElementById('addWishBtn');
+
+    const starSvg = `<svg viewBox="0 0 24 24" class="icon-orange-fill"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2-6-4.8-6 4.8L8.9 14 3 9.2h7.6L12 2z"/></svg>`;
+
+    function renderWishes() {
+      wishList.innerHTML = '';
+      if (wishes.length === 0) {
+        wishList.innerHTML = '<li class="empty-hint">写下心愿，未来会实现的~</li>';
+        return;
+      }
+      wishes.forEach(wish => {
+        const li = document.createElement('li');
+        li.className = 'wish-item';
+        li.innerHTML = `
+          <span class="wish-star">${starSvg}</span>
+          <span class="wish-text">${escapeHtml(wish.text)}</span>
+          <button class="wish-delete" data-id="${wish.id}">×</button>
+        `;
+        wishList.appendChild(li);
+      });
+    }
+
+    wishList.addEventListener('click', (e) => {
+      const del = e.target.closest('.wish-delete');
+      if (del) {
+        wishes = wishes.filter(w => w.id !== del.dataset.id);
+        save('wishes', wishes);
+        renderWishes();
+      }
+    });
+
+    function addWish() {
+      const text = wishInput.value.trim();
+      if (!text) return;
+      wishes.push({ id: 'w' + Date.now(), text });
+      save('wishes', wishes);
+      wishInput.value = '';
+      renderWishes();
+    }
+
+    addWishBtn.addEventListener('click', addWish);
+    wishInput.addEventListener('keypress', e => { if (e.key === 'Enter') addWish(); });
+
+    // ===== 文本笔记自动保存 =====
+    function bindNote(id, key, hintId) {
+      const el = document.getElementById(id);
+      const hint = document.getElementById(hintId);
+      el.value = notes[key];
+      let timer;
+      el.addEventListener('input', () => {
+        notes[key] = el.value;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          save(key, notes[key]);
+          hint.textContent = '已保存 ' + new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+        }, 500);
+        hint.textContent = '正在保存...';
+      });
+    }
+
+    bindNote('memoText', 'memo', 'memoHint');
+    bindNote('notesText', 'notes', 'notesHint');
+    bindNote('healthText', 'health', 'healthHint');
+    bindNote('makeupText', 'makeup', 'makeupHint');
+    bindNote('outfitText', 'outfit', 'outfitHint');
+
+    // ===== 工具 =====
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+    }
+
+    function showConfetti(el) {
+      const rect = el.getBoundingClientRect();
+      const colors = ['#81c784', '#f48fb1', '#ffb74d', '#4db6ac'];
+      for (let i = 0; i < 6; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 2L13.5 8.5L20 7L15.5 11.5L22 15L15 15L17 22L12 17.5L7 22L9 15L2 15L8.5 11.5L4 7L10.5 8.5L12 2Z" fill="${colors[Math.floor(Math.random()*colors.length)]}"/></svg>`;
+        c.style.left = (rect.left + rect.width/2 + (Math.random()-0.5)*40) + 'px';
+        c.style.top = (rect.top + window.scrollY) + 'px';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 1200);
+      }
+    }
+
+    // ===== PWA 安装提示 =====
+    let deferredPrompt = null;
+    const installBar = document.getElementById('installBar');
+    const installBtn = document.getElementById('installBtn');
+    const installClose = document.getElementById('installClose');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBar.classList.add('show');
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBar.classList.remove('show');
+    });
+
+    installClose.addEventListener('click', () => installBar.classList.remove('show'));
+
+    // ===== Service Worker =====
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('data:text/javascript,' + encodeURIComponent(`
+        self.addEventListener('install', e => self.skipWaiting());
+        self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+        self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+      `)).catch(() => {});
+    }
+
+    // ===== 初始化渲染 =====
+    renderTasks();
+    renderWishes();
+  </script>
+</body>
+</html>
